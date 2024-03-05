@@ -29,8 +29,9 @@ function mainFunction(){
     in vec3 vertexPosition;
     in vec4 colorValue;
     out vec4 varyColor;
+    uniform mat4 matrix;
     void main() {
-        gl_Position = vec4(vertexPosition, 1.0);
+        gl_Position = matrix * vec4(vertexPosition, 1.0);
         varyColor = colorValue;
     }
     `;
@@ -162,8 +163,18 @@ function mainFunction(){
         gl.drawArrays(gl.TRIANGLE_FAN, 20, 4);
     }
 
-    function update() {
+    const uniformLocations = {
+        matrix: gl.getUniformLocation(programCube, `matrix`),
+    };
 
+    const matrix = mat4.create();
+    mat4.translate(matrix, matrix, [.2, .5, 0]);
+    mat4.scale(matrix, matrix, [0.25, 0.25, 0.25]);
+
+    function update() {
+        mat4.rotateZ(matrix, matrix, Math.PI/2 / 70);
+        mat4.rotateX(matrix, matrix, Math.PI/2 / 70);
+        gl.uniformMatrix4fv(uniformLocations.matrix, false, matrix);
     }
 
     var isAnimating = false;
