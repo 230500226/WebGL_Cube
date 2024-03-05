@@ -1,0 +1,55 @@
+body {
+    background-color: darkblue;
+    padding: 25px;
+}
+
+#IDcanvas {
+    width: 400px;
+    height: 400px;
+  //  background-color: darkpurple;
+  //not using since triangle render gets placed randomly on canvas and axies get confused
+}
+
+#error-box {
+    width: 800px;
+    height: 200px;
+    background-color: black;
+    margin-top: 20px;
+    color: #fd8080;
+    font-weight: 500;
+    font-size: 18pt;
+    border: 1px solid white;
+    padding: 25px;
+    overflow: auto; 
+    word-wrap: break-word;
+}
+
+.button {
+    padding: 10px 15px;
+    font-size: 20px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 6px #999;
+}
+
+#btnZock {
+    background-color: #77dd77; 
+}
+
+#btnYLock {
+    background-color: #aec6cf;
+}
+
+#btnXLock {
+    background-color: #540d2d;
+}
+#btnReset {
+    background-color: #6a6b1a;
+}
+#btnStartStop {
+    background-color: #095408;
+}
