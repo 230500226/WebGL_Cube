@@ -255,7 +255,7 @@ function mainFunction() {
         0, 0.25, 0, 0,
         0, 0, 0.25, 0,
         0, 0, 0, 1
-    ]
+    ]l
 
     const manualRotateMatrix = [
         Math.cos(theta), -Math.sin(theta), 0, 0,
