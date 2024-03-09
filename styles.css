@@ -1,6 +1,8 @@
 body {
-    background-color: darkblue;
+    background-color: grey;
     padding: 25px;
+    margin:25px;
+    width:50%;
 }
 
 #IDcanvas {

@@ -8,7 +8,7 @@ function showError(errorText) {
 }
 
 function mainFunction(){
-
+showError("this is cubev1");
     // Get canvas
     const canvas = document.getElementById("IDcanvas");
     if (!canvas){
@@ -29,9 +29,8 @@ function mainFunction(){
     in vec3 vertexPosition;
     in vec4 colorValue;
     out vec4 varyColor;
-    uniform mat4 matrix;
     void main() {
-        gl_Position = matrix * vec4(vertexPosition, 1.0);
+        gl_Position = vec4(vertexPosition, 1.0);
         varyColor = colorValue;
     }
     `;
@@ -48,7 +47,7 @@ function mainFunction(){
         return;
     }
 
-    // Fragment shader source code for (neon green)
+    // Fragment shader source code for pentagon (neon green)
     const fSSCCube = `#version 300 es
     precision mediump float;
     in vec4 varyColor;
@@ -62,20 +61,17 @@ function mainFunction(){
     gl.shaderSource(fragmentShaderCube, fSSCCube);
     gl.compileShader(fragmentShaderCube);
 
-    // Error checking fragmen tshader
     if (!gl.getShaderParameter(fragmentShaderCube, gl.COMPILE_STATUS)){
         const errorMessage = gl.getShaderInfoLog(fragmentShaderCube);
         showError('Compile fragment error: ' + errorMessage);
         return;
     }
-
     // Create shader program for cube
     const programCube = gl.createProgram();
     gl.attachShader(programCube, vertexShader);
     gl.attachShader(programCube, fragmentShaderCube);
     gl.linkProgram(programCube);
 
-    // Error checking programCube
     if (!gl.getProgramParameter(programCube, gl.LINK_STATUS)) {
         const errorMessage = gl.getProgramInfoLog(programCube);
         showError(`Failed to link GPU program: ${errorMessage}`);
@@ -89,7 +85,6 @@ function mainFunction(){
         return;
     }
 
-    // Get attribLocation of colorValue
     const positionColor = gl.getAttribLocation(programCube, "colorValue");
     if (positionColor < 0) {
         showError(`Failed to get attribute location for colorValue`);
@@ -98,6 +93,7 @@ function mainFunction(){
     }
 
     // Define the vertices for the cube
+
     const arrayCube = [
         // Vertices        // RGBA
         // Red (front face)
@@ -144,7 +140,6 @@ function mainFunction(){
     gl.enableVertexAttribArray(positionColor);
     gl.enable(gl.DEPTH_TEST);
 
-    // Set canvas width and height
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
@@ -167,18 +162,8 @@ function mainFunction(){
         gl.drawArrays(gl.TRIANGLE_FAN, 20, 4);
     }
 
-    const uniformLocations = {
-        matrix: gl.getUniformLocation(programCube, `matrix`),
-    };
-
-    const matrix = mat4.create();
-    mat4.translate(matrix, matrix, [.2, .5, 0]);
-    mat4.scale(matrix, matrix, [0.25, 0.25, 0.25]);
-
     function update() {
-        mat4.rotateZ(matrix, matrix, Math.PI/2 / 70);
-        mat4.rotateX(matrix, matrix, Math.PI/2 / 70);
-        gl.uniformMatrix4fv(uniformLocations.matrix, false, matrix);
+
     }
 
     var isAnimating = false;
@@ -205,4 +190,3 @@ try {
 } catch (error) {
     showError('failed to run mainFunction() JS exception'+error);
 }
-
