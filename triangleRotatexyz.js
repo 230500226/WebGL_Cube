@@ -48,7 +48,7 @@ function mainFunction(){
         return;
     }
 
-    // Fragment shader source code for pentagon (neon green)
+    // Fragment shader source code for (neon green)
     const fSSCCube = `#version 300 es
     precision mediump float;
     in vec4 varyColor;
@@ -62,17 +62,20 @@ function mainFunction(){
     gl.shaderSource(fragmentShaderCube, fSSCCube);
     gl.compileShader(fragmentShaderCube);
 
+    // Error checking fragmen tshader
     if (!gl.getShaderParameter(fragmentShaderCube, gl.COMPILE_STATUS)){
         const errorMessage = gl.getShaderInfoLog(fragmentShaderCube);
         showError('Compile fragment error: ' + errorMessage);
         return;
     }
+
     // Create shader program for cube
     const programCube = gl.createProgram();
     gl.attachShader(programCube, vertexShader);
     gl.attachShader(programCube, fragmentShaderCube);
     gl.linkProgram(programCube);
 
+    // Error checking programCube
     if (!gl.getProgramParameter(programCube, gl.LINK_STATUS)) {
         const errorMessage = gl.getProgramInfoLog(programCube);
         showError(`Failed to link GPU program: ${errorMessage}`);
@@ -86,6 +89,7 @@ function mainFunction(){
         return;
     }
 
+    // Get attribLocation of colorValue
     const positionColor = gl.getAttribLocation(programCube, "colorValue");
     if (positionColor < 0) {
         showError(`Failed to get attribute location for colorValue`);
@@ -94,7 +98,6 @@ function mainFunction(){
     }
 
     // Define the vertices for the cube
-
     const arrayCube = [
         // Vertices        // RGBA
         // Red (front face)
@@ -141,6 +144,7 @@ function mainFunction(){
     gl.enableVertexAttribArray(positionColor);
     gl.enable(gl.DEPTH_TEST);
 
+    // Set canvas width and height
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
