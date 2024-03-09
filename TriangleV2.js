@@ -7,7 +7,6 @@ function showError(errorText) {
 }
 
 function mainFunction() {
-    showError("this is triangle2.js");
 
     const canvas = document.getElementById("IDcanvas");
     if (!canvas) {
@@ -55,7 +54,7 @@ function mainFunction() {
 
         void main() {
             vColor = color;
-            gl_Position = u_TranslateMatrix * vec4(position, 1);
+            gl_Position = u_ScaleMatrix * u_RotateMatrix * u_TranslateMatrix * vec4(position, 1);
         }
     `);
     gl.compileShader(vertexShader);
@@ -118,23 +117,23 @@ function mainFunction() {
     gl.useProgram(program);
 
     const uniformLocations = {
-        uTranslateMatrix: gl.getUniformLocation(program, `u_TranslateMatrix`),
-        uScaleMatrix: gl.getUniformLocation(program, `u_ScaleMatrix`), 
-        uRotationMatrix: gl.getUniformLocation(program, `u_RotateMatrix`),
+       uTranslateMatrix: gl.getUniformLocation(program, `u_TranslateMatrix`),
+       uScaleMatrix: gl.getUniformLocation(program, `u_ScaleMatrix`), 
+       uRotateMatrix: gl.getUniformLocation(program, `u_RotateMatrix`),
     };
 
     if (uniformLocations.uTranslateMatrix == null) {
         showError(`Failed to get uniform location for u_TranslateMatrix`);
         return;
     }
-    // if (uniformLocations.uScaleMatrix == null) {
-    //     showError(`Failed to get uniform location for u_ScaleMatrix`);
-    //     return;
-    // }
-    // if (uniformLocations.uRotationMatrix == null) {
-    //     showError(`Failed to get uniform location for u_RotateMatrix`);
-    //     return;
-    // }
+    if (uniformLocations.uScaleMatrix == null) {
+        showError(`Failed to get uniform location for u_ScaleMatrix`);
+        return;
+    }
+    if (uniformLocations.uRotateMatrix == null) {
+        showError(`Failed to get uniform location for u_RotateMatrix`);
+        return;
+    }
 
     // Start of matrix calculations
     // TRANSLATE matrix
@@ -142,10 +141,10 @@ function mainFunction() {
     // const matrix = mat4.create();
     
     const IdMatrix = [
-        [1,0,0],
-        [0,1,0],
-        [0,0,1],
-    ];
+        [1, 0, 0,],
+        [0, 1, 0],
+        [0, 0, 1]
+    ]; 
     
     // mat3.translate(matrix, matrix, [.2, .5, 0]);
     
@@ -163,6 +162,7 @@ function mainFunction() {
 
     function translateMatrix(matrix, vector) {
         var result = [];
+        var numcols = Math.sqrt(matrix.length);
         for (var i = 0; i < matrix.length; i++) {
             result[i] = [];
             for (var j = 0; j < matrix[i].length; j++) {
@@ -177,7 +177,6 @@ function mainFunction() {
     }
     // const translatedMatrix = translateMatrixMathJS(IdMatrix, translationVector);
     const translatedMatrix = translateMatrix(IdMatrix, translationVector);
-   showError(translatedMatrix); 
     // SCALE matrix
 
     // mat4.scale(matrix, matrix, [0.25, 0.25, 0.25]);
@@ -244,17 +243,39 @@ function mainFunction() {
     const mat4Matrix = mat3ToMat4(translatedMatrix);
     const transposedMatrix = transposeMatrix(mat4Matrix);
 
+    const manualTranslateMatrix = [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0.4, 0.4, 0, 1
+    ]
+
+    const manualScaleMatrix = [
+        0.25, 0, 0, 0,
+        0, 0.25, 0, 0,
+        0, 0, 0.25, 0,
+        0, 0, 0, 1
+    ]
+
+    const manualRotateMatrix = [
+        Math.cos(theta), -Math.sin(theta), 0, 0,
+        Math.sin(theta), Math.cos(theta), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]
+
     function animate() {
-        //requestAnimationFrame(animate);
+        requestAnimationFrame(animate);
         // mat4.rotateZ(matrix, matrix, Math.PI / 2 / 70);
-        gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, new Float32Array(transposedMatrix));
-        // gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, scaledMatrix);
-        // gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, rotatedZMatrix);
+        gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, manualTranslateMatrix);
+        gl.uniformMatrix4fv(uniformLocations.uScaleMatrix, false, manualScaleMatrix);
+        gl.uniformMatrix4fv(uniformLocations.uRotateMatrix, false, manualRotateMatrix);
+        theta = theta + 1;
         gl.clearColor(0.1, 0.3, 0.3, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
-   showError(transposedMatrix);
+  // showError(transposedMatrix);
     animate();
 }
 
