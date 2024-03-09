@@ -211,7 +211,6 @@ function mainFunction() {
 
     // ROTATEZ matrix
 
-    var theta = Math.PI / 100;
     const rotationMatrixZ = [
         [Math.cos(theta), -Math.sin(theta), 0],
         [Math.sin(theta), Math.cos(theta), 0],
@@ -222,19 +221,19 @@ function mainFunction() {
     // bug fix translate
     function mat3ToMat4(mat3) {
         return [
-        [mat3[0][0], mat3[0][1], mat3[0][2], 0],
+            [mat3[0][0], mat3[0][1], mat3[0][2], 0],
         [mat3[1][0], mat3[1][1], mat3[1][2], 0],
         [mat3[2][0], mat3[2][1], mat3[2][2], 0],
         [0,          0,          0,          1] 
-        ];
-    }
+    ];
+}
 
-    function transposeMatrix(matrix) {
-        let transposed = [];
-        for (let i = 0; i < matrix.length; i++) {
-            for (let j = 0; j < matrix[i].length; j++) {
-                if (transposed[j] === undefined) transposed[j] = [];
-                transposed[j][i] = matrix[i][j];
+function transposeMatrix(matrix) {
+    let transposed = [];
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+            if (transposed[j] === undefined) transposed[j] = [];
+            transposed[j][i] = matrix[i][j];
             }
         }
         return transposed.flat();
@@ -255,22 +254,25 @@ function mainFunction() {
         0, 0.25, 0, 0,
         0, 0, 0.25, 0,
         0, 0, 0, 1
-    ]l
-
-    const manualRotateMatrix = [
-        Math.cos(theta), -Math.sin(theta), 0, 0,
-        Math.sin(theta), Math.cos(theta), 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
     ]
 
+    var theta = Math.PI / 70;
+
+    
     function animate() {
         requestAnimationFrame(animate);
         // mat4.rotateZ(matrix, matrix, Math.PI / 2 / 70);
+
+        const manualRotateMatrix = [
+            1, 0, 0, 0,
+            0, Math.cos(theta),-Math.sin(theta), 0,
+            0, Math.sin(theta), Math.cos(theta), 0,
+            0, 0, 0, 1,
+        ]
         gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, manualTranslateMatrix);
         gl.uniformMatrix4fv(uniformLocations.uScaleMatrix, false, manualScaleMatrix);
         gl.uniformMatrix4fv(uniformLocations.uRotateMatrix, false, manualRotateMatrix);
-        theta = theta + 1;
+        theta = theta + Math.PI / 70;
         gl.clearColor(0.1, 0.3, 0.3, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
