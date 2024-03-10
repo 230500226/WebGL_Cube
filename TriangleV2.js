@@ -20,18 +20,21 @@ function mainFunction() {
         return;
     }
 
+    // Triangle Vertices
     const vertexData = [
         0, 1, 0,    // V1.position
         1, -1, 0,   // V2.position
         -1, -1, 0,  // V3.position
     ];
 
+    // Color for each vertex
     const colorData = [
         1, 0, 0,    // V1.color
         0, 1, 0,    // V2.color
         0, 0, 1,    // V3.color
     ];
 
+    // Vertex and Color buffer
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
@@ -40,6 +43,8 @@ function mainFunction() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
 
+
+    // Vertex Shader
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, `
         precision mediump float;
@@ -58,13 +63,13 @@ function mainFunction() {
         }
     `);
     gl.compileShader(vertexShader);
-
     if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
         const errorMessage = gl.getShaderInfoLog(vertexShader);
         showError('Compile vertex error: ' + errorMessage);
         return;
     }
 
+    //Fragment Shader
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragmentShader, `
         precision mediump float;
@@ -84,6 +89,7 @@ function mainFunction() {
     }
     console.log(gl.getShaderInfoLog(fragmentShader));
 
+    // Create program triangle
     const program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
@@ -94,28 +100,29 @@ function mainFunction() {
         return;
     }
 
+    //getAttribLaocation for vertex position
     const positionLocation = gl.getAttribLocation(program, `position`);
     if (positionLocation< 0) {
         showError(`Failed to get attribute location for position`);
         return;
     }
-
     gl.enableVertexAttribArray(positionLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
 
+    //getAttribLaocation for color position 
     const colorLocation = gl.getAttribLocation(program, `color`);
     if (colorLocation< 0) {
         showError(`Failed to get attribute location for position`);
         return;
     }
-
     gl.enableVertexAttribArray(colorLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
 
     gl.useProgram(program);
 
+    // get UniformLocations for matricies
     const uniformLocations = {
        uTranslateMatrix: gl.getUniformLocation(program, `u_TranslateMatrix`),
        uScaleMatrix: gl.getUniformLocation(program, `u_ScaleMatrix`), 
@@ -137,147 +144,157 @@ function mainFunction() {
 
     // Start of matrix calculations
     // TRANSLATE matrix
-    
-    // const matrix = mat4.create();
+        // gl.matrix
+        // const matrix = mat4.create();
     
     const IdMatrix = [
-        [1, 0, 0,],
-        [0, 1, 0],
-        [0, 0, 1]
-    ]; 
-    
-    // mat3.translate(matrix, matrix, [.2, .5, 0]);
-    
-    const translationVector = [
-        .4, .4, 0
-    ];
-
-
-    
-    // function translateMatrixMathJS(matrix, vector){
-    //     var result = math.clone(matrix);
-    //     result = math.add(result, math.concat(vector, [0]));
-    //     return result;
-    // }
-
-    function translateMatrix(matrix, vector) {
-        var result = [];
-        var numcols = Math.sqrt(matrix.length);
-        for (var i = 0; i < matrix.length; i++) {
-            result[i] = [];
-            for (var j = 0; j < matrix[i].length; j++) {
-                if (j === matrix[0].length - 1) {
-                    result[i][j] = matrix[i][j] + vector[i];
-                } else {
-                    result[i][j] = matrix[i][j];
-                }
-            }
-        }
-        return result;
-    }
-    // const translatedMatrix = translateMatrixMathJS(IdMatrix, translationVector);
-    const translatedMatrix = translateMatrix(IdMatrix, translationVector);
-    // SCALE matrix
-
-    // mat4.scale(matrix, matrix, [0.25, 0.25, 0.25]);
-
-    const scaleVector = [0.25,0.25,0.25];
-
-    // function scaleMatrixMathJS(matrix, vector){
-    //     var result = math.clone(matrix);
-    //     for(var i = 0; i < matrix.lengthl; i++){
-    //         result[i][i] = result[i][i] * vector[i];
-    //     }
-    //     return result;
-    // }
-
-    function scaleMatrix(matrix, vector){
-        var result = [];
-        for(var i = 0; i < matrix.length; i++){
-            result[i] = [];
-            for (var j = 0; j < matrix[0].lengthl; j++){
-                if (i === j){
-                    result[i][i] = matrix[i][j] * vector[j];
-                } else {
-                    result[i][i] = matrix[i][j];
-                }
-            }
-        }
-        return result;
-    }
-
-    // const scaledMatrix = scaleMatrixMathJS(IdMatrix, scaleVector);
-    const scaledMatrix = scaleMatrix(IdMatrix, scaleVector);
-
-    // ROTATEZ matrix
-
-    const rotationMatrixZ = [
-        [Math.cos(theta), -Math.sin(theta), 0],
-        [Math.sin(theta), Math.cos(theta), 0],
-        [0,0,1]
-    ];
-    const rotatedZMatrix = rotationMatrixZ;
-   
-    // bug fix translate
-    function mat3ToMat4(mat3) {
-        return [
-            [mat3[0][0], mat3[0][1], mat3[0][2], 0],
-        [mat3[1][0], mat3[1][1], mat3[1][2], 0],
-        [mat3[2][0], mat3[2][1], mat3[2][2], 0],
-        [0,          0,          0,          1] 
-    ];
-}
-
-function transposeMatrix(matrix) {
-    let transposed = [];
-    for (let i = 0; i < matrix.length; i++) {
-        for (let j = 0; j < matrix[i].length; j++) {
-            if (transposed[j] === undefined) transposed[j] = [];
-            transposed[j][i] = matrix[i][j];
-            }
-        }
-        return transposed.flat();
-    }
-
-    const mat4Matrix = mat3ToMat4(translatedMatrix);
-    const transposedMatrix = transposeMatrix(mat4Matrix);
-
-    const manualTranslateMatrix = [
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
-        0.4, 0.4, 0, 1
-    ]
+        0, 0, 0, 1
+    ]; 
+    
+        // gl.matrix
+        // mat3.translate(matrix, matrix, [.2, .5, 0]);
+    
+    const translationVector = [
+        .4, .5, 0, 0
+    ];
+    
+    function translateMatrix(matrix, translationVector) {
+        if (matrix.length !== 16 || translationVector.length !== 4) {
+            throw new Error("translateMatrix Input matrix must be a 4x4 matrix, and translation vector must have 4 elements.");
+            showError("translateMatrix Input matrix must be a 4x4 matrix, and translation vector must have 4 elements.");
+        }
+        
+        // Extract the existing translation from the input matrix
+        const existingTranslation = [matrix[12], matrix[13], matrix[14]];
+        
+        // Add the new translation to the existing one
+        const newTranslation = [
+            existingTranslation[0] + translationVector[0],
+            existingTranslation[1] + translationVector[1],
+            existingTranslation[2] + translationVector[2]
+        ];
+        
+        // Create the resulting translation matrix
+        const resultMatrix = [
+            matrix[0], matrix[1], matrix[2], matrix[3],
+            matrix[4], matrix[5], matrix[6], matrix[7],
+            matrix[8], matrix[9], matrix[10], matrix[11],
+            newTranslation[0], newTranslation[1], newTranslation[2], matrix[15]
+        ];
+        
+        return resultMatrix;
+    }
 
-    const manualScaleMatrix = [
-        0.25, 0, 0, 0,
-        0, 0.25, 0, 0,
-        0, 0, 0.25, 0,
+    const translatedMatrix = translateMatrix(IdMatrix, translationVector);
+
+    // SCALE matrix
+        // gl.matrix
+        // mat4.scale(matrix, matrix, [0.25, 0.25, 0.25]);
+
+    const scaleVector = [0.25,0.25,0.25, 1];
+
+    function scaleMatrix(matrix, scaleVector) {
+        if (matrix.length !== 16 || scaleVector.length !== 4) {
+            throw new Error("scaleMatrix Input matrix must be a 4x4 matrix, and scale vector must have 4 elements.");
+            showError("scaleMatrix Input matrix must be a 4x4 matrix, and scale vector must have 4 elements.");
+        }
+        
+        // Apply scaling to each row of the matrix
+        const scaledMatrix = matrix.map((value, index) => value * scaleVector[index % 4]);
+        
+        return scaledMatrix;
+    }
+
+    const scaledMatrix = scaleMatrix(IdMatrix, scaleVector);
+
+    // ROTATE matrix
+        // Rotate Z axis (YAW)
+    const rotationMatrixZ = [
+        Math.cos(theta), -Math.sin(theta), 0, 0,
+        Math.sin(theta), Math.cos(theta), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ];
+        // Rotate Z function (YAW)
+    function rotateZ(matrix, theta){
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+        const result = matrix.slice(); // create a copy of matrix to modify the result
+
+        // Applying the rotation transformation
+        result[0] = cosTheta * matrix[0] - sinTheta * matrix[1];
+        result[1] = sinTheta * matrix[0] + cosTheta * matrix[1];
+        result[4] = cosTheta * matrix[4] - sinTheta * matrix[5];
+        result[5] = sinTheta * matrix[4] + cosTheta * matrix[5];
+
+        return result;
+    }
+        //Rotate X axis (Pitch)    
+    const rotationMatrixX = [
+        1, 0, 0, 0,
+        0, Math.cos(theta), Math.sin(theta), 0,
+        0, Math.sin(theta), Math.cos(theta), 0,
         0, 0, 0, 1
     ]
+        // Rotate X function (Pitch)
+    function rotateX(matrix, theta){
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+        const result = matrix.slice(); // create a copy of matrix to modify the result
 
+        // Applying the rotation transformation
+        result[5] = cosTheta * matrix[5] - sinTheta * matrix[9];
+        result[6] = sinTheta * matrix[5] + cosTheta * matrix[9];
+        result[9] = -sinTheta * matrix[5] + cosTheta * matrix[9];
+        result[10] = cosTheta * matrix[10] - sinTheta * matrix[14];
+
+        return result;
+    }
+        //Rotate Y axis (Roll)
+    const rotationMatrixY = [
+        Math.cos(theta), 0, Math.sin(theta), 0,
+        0, 1, 0, 0,
+        -Math.sin(theta), 0, Math.cos(theta), 0,
+        0, 0, 0, 1
+    ];
+        // Rotate Y function (Roll)
+    function rotateY(matrix, theta) {
+        const cosTheta = Math.cos(theta);
+        const sinTheta = Math.sin(theta);
+        const result = matrix.slice(); // Create a copy of the matrix to modify the result
+
+        // Apply the rotation transformation
+        result[0] = cosTheta * matrix[0] + sinTheta * matrix[2];
+        result[2] = -sinTheta * matrix[0] + cosTheta * matrix[2];
+        result[8] = cosTheta * matrix[8] + sinTheta * matrix[10];
+        result[10] = -sinTheta * matrix[8] + cosTheta * matrix[10];
+
+        return result;
+    }
+  
+    // Animation loop
     var theta = Math.PI / 70;
-
-    
+    var IdRotationMatrix = IdMatrix;
     function animate() {
         requestAnimationFrame(animate);
+        // gl.matrix
         // mat4.rotateZ(matrix, matrix, Math.PI / 2 / 70);
 
-        const manualRotateMatrix = [
-            1, 0, 0, 0,
-            0, Math.cos(theta),-Math.sin(theta), 0,
-            0, Math.sin(theta), Math.cos(theta), 0,
-            0, 0, 0, 1,
-        ]
-        gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, manualTranslateMatrix);
-        gl.uniformMatrix4fv(uniformLocations.uScaleMatrix, false, manualScaleMatrix);
-        gl.uniformMatrix4fv(uniformLocations.uRotateMatrix, false, manualRotateMatrix);
-        theta = theta + Math.PI / 70;
+        rotatedMatrix = rotateX(IdRotationMatrix, theta);
+        // rotatedMatrix = rotateY(IdRotationMatrix, theta);
+        // rotatedMatrix = rotateZ(IdRotationMatrix, theta);
+        theta = theta + Math.PI / 500;
+
+        gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, translatedMatrix);
+        gl.uniformMatrix4fv(uniformLocations.uScaleMatrix, false, scaledMatrix);
+        gl.uniformMatrix4fv(uniformLocations.uRotateMatrix, false, rotatedMatrix);
         gl.clearColor(0.1, 0.3, 0.3, 1);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
-  // showError(transposedMatrix);
     animate();
 }
 
