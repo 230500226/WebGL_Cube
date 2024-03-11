@@ -1,4 +1,6 @@
 //display errors in the browser
+//Link to this file
+//http://localhost:3000/?script=CubeV1
 function showError(errorText) {
     const errorBoxDiv = document.getElementById('error-box'); //find error box
     const errorSpan = document.createElement('p');    //create span (paragraph element) to store error tex
@@ -28,9 +30,13 @@ showError("this is cubev1");
     precision mediump float;
     in vec3 vertexPosition;
     in vec4 colorValue;
+    uniform mat4 u_rotateX;
+    uniform mat4 u_rotateY;
+    uniform mat4 u_rotateZ;
+    uniform mat4 u_scale;
     out vec4 varyColor;
     void main() {
-        gl_Position = vec4(vertexPosition, 1.0);
+        gl_Position = u_scale * u_rotateX * u_rotateY * u_rotateZ * vec4(vertexPosition, 1.0);
         varyColor = colorValue;
     }
     `;
@@ -143,6 +149,83 @@ showError("this is cubev1");
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
+    const IdMatrix = [
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]
+
+   const uniformLocations = {
+        uRotateX : gl.getUniformLocation(programCube, "u_rotateX"),
+        uRotateY : gl.getUniformLocation(programCube, "u_rotateY"),
+        uRotateZ : gl.getUniformLocation(programCube, "u_rotateZ"),
+        uScale : gl.getUniformLocation(programCube, "u_scale"),
+   }
+
+    if (uniformLocations.uRotateX == null) {
+        showError(`Failed to get uniform location for u_rotateX`);
+        return;
+    }
+    if (uniformLocations.uRotateY == null) {
+        showError(`Failed to get uniform location for u_rotateY`);
+        return;
+    }
+    if (uniformLocations.uRotateZ == null) {
+        showError(`Failed to get uniform location for u_rotateZ`);
+        return;
+    }
+    if (uniformLocations.uScale == null) {
+        showError(`Failed to get uniform location for u_scale`);
+        return;
+    }
+    
+   function rotateX(matrix, theta){
+       const cosTheta = Math.cos(theta);
+       const sinTheta = Math.sin(theta);
+       const result = matrix.slice();
+       result[5] = cosTheta * matrix[5] - sinTheta * matrix[9];
+       result[6] = sinTheta * matrix[5] + cosTheta * matrix[9];
+       result[9] = -sinTheta * matrix[5] + cosTheta * matrix[9];
+       return result;
+   } 
+
+   function rotateY(matrix, theta) {
+       const cosTheta = Math.cos(theta);
+       const sinTheta = Math.sin(theta);
+       const result = matrix.slice(); // Create a copy of the matrix to modify the result
+       // Apply the rotation transformation
+       result[0] = cosTheta * matrix[0] + sinTheta * matrix[2];
+       result[2] = -sinTheta * matrix[0] + cosTheta * matrix[2];
+       result[8] = cosTheta * matrix[8] + sinTheta * matrix[10];
+       result[10] = -sinTheta * matrix[8] + cosTheta * matrix[10];
+       return result;
+   }
+
+   function rotateZ(matrix, theta){
+       const cosTheta = Math.cos(theta);
+       const sinTheta = Math.sin(theta);
+       const result = matrix.slice();
+       result[0] = cosTheta * matrix[0] - sinTheta * matrix[1];
+       result[1] = sinTheta * matrix[0] + cosTheta * matrix[1];
+       result[4] = cosTheta * matrix[4] - sinTheta * matrix[5];
+       result[5] = sinTheta * matrix[4] + cosTheta * matrix[5];
+       return result;
+   }
+
+   function scaleMatrix(matrix, scaleVector) {
+       if (matrix.length !== 16 || scaleVector.length !== 4) {
+           throw new Error('scaleMatrix Input matrix must be a 4x4 matrix, and scale vector must have 4 elements.');
+           showError('scaleMatrix Input matrix must be a 4x4 matrix, and scale vector must have 4 elements.');
+       }
+       const scaledMatrix = matrix.map((value, index) => value * scaleVector[index % 4]);
+       return scaledMatrix;
+   }
+
+    const scaleVector = [
+        0.25, 0.25, 0.25, 1
+    ]
+    var theta = 0;
     function draw() {
 
         gl.clearColor(0.1, 0.3, 0.3, 1);
@@ -154,6 +237,13 @@ showError("this is cubev1");
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferTriangle);
         gl.vertexAttribPointer(positionVertex, 3, gl.FLOAT, false, 7*4, 0);
         gl.vertexAttribPointer(positionColor, 4, gl.FLOAT, false, 7*4, 3*4);
+
+        theta = theta + Math.PI / 500;
+        gl.uniformMatrix4fv(uniformLocations.uRotateX, false, rotateX(IdMatrix, theta)); //change values to 1 to stop 
+        gl.uniformMatrix4fv(uniformLocations.uRotateY, false, rotateY(IdMatrix, theta));
+        gl.uniformMatrix4fv(uniformLocations.uRotateZ, false, rotateX(IdMatrix, theta));
+        gl.uniformMatrix4fv(uniformLocations.uScale, false, scaleMatrix(IdMatrix, scaleVector));
+        
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
         gl.drawArrays(gl.TRIANGLE_FAN, 4, 4);
         gl.drawArrays(gl.TRIANGLE_FAN, 8, 4);
@@ -165,7 +255,8 @@ showError("this is cubev1");
     function update() {
 
     }
-
+    
+    //not working
     var isAnimating = false;
     function toggleAnimation() {
         isAnimating = !isAnimating;

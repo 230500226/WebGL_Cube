@@ -83,19 +83,18 @@ function mainFunction() {
     gl.compileShader(fragmentShader);
 
     if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)){
-        const errorMessage = gl.getShaderInfoLog(fragmentShaderCube);
+        const errorMessage = gl.getShaderInfoLog(fragmentShader);
         showError('Compile fragment error: ' + errorMessage);
         return;
     }
-    console.log(gl.getShaderInfoLog(fragmentShader));
 
-    // Create program triangle
+    // Create program 
     const program = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        const errorMessage = gl.getProgramInfoLog(programCube);
+        const errorMessage = gl.getProgramInfoLog(program);
         showError(`Failed to link GPU program: ${errorMessage}`);
         return;
     }
