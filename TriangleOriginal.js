@@ -1,3 +1,5 @@
+//Link to this file
+//http://localhost:3000/?script=TriangleOriginal
 const canvas = document.getElementById('IDcanvas');
 const gl = canvas.getContext('webgl');
 

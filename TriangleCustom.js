@@ -1,3 +1,7 @@
+//Link to this file
+//http://localhost:3000/?script=TriangleCustom
+
+
 function showError(errorText) {
     const errorBoxDiv = document.getElementById('error-box'); //find error box
     const errorSpan = document.createElement('p');    //create span (paragraph element) to store error tex

@@ -1,4 +1,5 @@
-
+//Link to this file
+//http://localhost:3000/?script=CubeOriginal
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
