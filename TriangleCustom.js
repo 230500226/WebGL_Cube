@@ -286,9 +286,9 @@ function mainFunction() {
         // gl.matrix
         // mat4.rotateZ(matrix, matrix, Math.PI / 2 / 70);
 
-        rotatedMatrix = rotateX(IdRotationMatrix, theta);
-        // rotatedMatrix = rotateY(IdRotationMatrix, theta);
-        // rotatedMatrix = rotateZ(IdRotationMatrix, theta);
+        var rotatedMatrix = rotateX(IdRotationMatrix, theta);
+        // var rotatedMatrix = rotateY(IdRotationMatrix, theta);
+        // var rotatedMatrix = rotateZ(IdRotationMatrix, theta);
         theta = theta + Math.PI / 500;
 
         gl.uniformMatrix4fv(uniformLocations.uTranslateMatrix, false, translatedMatrix);
