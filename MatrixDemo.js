@@ -1,3 +1,4 @@
+//http://localhost:3000/?script=CubeCustom
 function showError(errorText) {
     const errorBoxDiv = document.getElementById('error-box'); //find error box
     const errorSpan = document.createElement('p');    //create span (paragraph element) to store error tex
@@ -51,11 +52,10 @@ function mainFunction() {
     
         void main() {
             vColor = color;
-            gl_Position = 
-            //u_ScaleMatrix * u_RotateMatrix * u_TranslateMatrix * 
-            vec4(position, 1);
+            gl_Position = u_ScaleMatrix * u_TranslateMatrix * u_RotateMatrix * vec4(position, 1);
         }
     `;
+
 
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexShaderSourceCode);
@@ -117,11 +117,15 @@ function mainFunction() {
         gl.useProgram(program);
 
     // get UniformLocations for matricies
-    const uniformLocations = {
-       uTranslateMatrix: gl.getUniformLocation(program, `u_TranslateMatrix`),
-       uScaleMatrix: gl.getUniformLocation(program, `u_ScaleMatrix`), 
-       uRotateMatrix: gl.getUniformLocation(program, `u_RotateMatrix`),
-    };
+    // const uniformLocations = {
+    //    uTranslateMatrix: gl.getUniformLocation(program, `u_TranslateMatrix`),
+    //    uScaleMatrix: gl.getUniformLocation(program, `u_ScaleMatrix`), 
+    //    uRotateMatrix: gl.getUniformLocation(program, `u_RotateMatrix`),
+    // };
+
+    const uScaleMatrix = gl.getUniformLocation(program, `u_ScaleMatrix`);
+    const uTranslateMatrix = gl.getUniformLocation(program, `u_TranslateMatrix`);
+    const uRotateMatrix = gl.getUniformLocation(program, `u_RotateMatrix`);
 
     // if (uniformLocations.uTranslateMatrix == null) {
     //     showError(`Failed to get uniform location for u_TranslateMatrix`);
@@ -136,26 +140,75 @@ function mainFunction() {
     //     return;
     // }
 
-    const IdMatrix = [
+    // const IdMatrix = [
+    //     1, 0, 0, 0,
+    //     0, 1, 0, 0,
+    //     0, 0, 1, 0,
+    //     0, 0, 0, 1
+    // ];
+// Scaleamtrix * vec4  = vec out [x*0.5, y*0.5, z*0.5, w*1]
+
+    const scaledMatrix=[
+        0.5, 0, 0, 0,
+        0, 0.5, 0, 0,
+        0, 0, 0.5, 0,
+        0, 0, 0, 1
+    ]
+
+    const translatedMatrix=[
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
+        -0.3, 0.3, 0, 1
+    ]
+    
+    var rotateXMatrix = [
+        1, 0, 0, 0,
+        0, Math.cos(theta), -Math.sin(theta), 0,
+        0, Math.sin(theta), Math.cos(theta), 0,
         0, 0, 0, 1
-    ];
+    ]
 
+    var rotateYMatrix = [
+        Math.cos(theta), 0, Math.sin(theta), 0,
+        0, 1, 0, 0,
+        -Math.sin(theta), 0, Math.cos(theta), 0,
+        0, 0, 0, 1
+    ]
+
+    var rotateZMatrix = [
+       Math.cos(theta), -Math.sin(theta), 0, 0,
+        Math.sin(theta), Math.cos(theta), 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    ]
     //Animation loop
+    // function rotateZMatrix(theta)
+    // {
+    //     return 
+    // }
 
     var theta = Math.PI /70;
 
     function animate() {
         requestAnimationFrame(animate);
         gl.clearColor(0.1, 0.3, 0.3, 1);
+        var rotateZMatrix = [
+            Math.cos(theta), -Math.sin(theta), 0, 0,
+             Math.sin(theta), Math.cos(theta), 0, 0,
+             0, 0, 1, 0,
+             0, 0, 0, 1
+         ];
+        gl.uniformMatrix4fv(uScaleMatrix, false, scaledMatrix);
+        gl.uniformMatrix4fv(uTranslateMatrix, false, translatedMatrix);
+        gl.uniformMatrix4fv(uRotateMatrix, false, rotateZMatrix);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
+        theta += 0.01;
     }
     animate();
 
-    showError('hello')
+    showError('This is MatrixDemo')
 }
 
 try {
