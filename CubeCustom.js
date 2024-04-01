@@ -10,7 +10,7 @@ function showError(errorText) {
 }
 
 function mainFunction(){
-showError("this is cubev1");
+showError("this is CubeCustom");
     // Get canvas
     const canvas = document.getElementById("IDcanvas");
     if (!canvas){
@@ -36,7 +36,7 @@ showError("this is cubev1");
     uniform mat4 u_scale;
     out vec4 varyColor;
     void main() {
-        gl_Position = u_scale * u_rotateX * u_rotateY * u_rotateZ * vec4(vertexPosition, 1.0);
+        gl_Position = u_scale * u_rotateX * vec4(vertexPosition, 1.0);
         varyColor = colorValue;
     }
     `;
@@ -167,14 +167,14 @@ showError("this is cubev1");
         showError(`Failed to get uniform location for u_rotateX`);
         return;
     }
-    if (uniformLocations.uRotateY == null) {
-        showError(`Failed to get uniform location for u_rotateY`);
-        return;
-    }
-    if (uniformLocations.uRotateZ == null) {
-        showError(`Failed to get uniform location for u_rotateZ`);
-        return;
-    }
+    // if (uniformLocations.uRotateY == null) {
+    //     showError(`Failed to get uniform location for u_rotateY`);
+    //     return;
+    // }
+    // if (uniformLocations.uRotateZ == null) {
+    //     showError(`Failed to get uniform location for u_rotateZ`);
+    //     return;
+    // }
     if (uniformLocations.uScale == null) {
         showError(`Failed to get uniform location for u_scale`);
         return;
@@ -187,6 +187,7 @@ showError("this is cubev1");
        result[5] = cosTheta * matrix[5] - sinTheta * matrix[9];
        result[6] = sinTheta * matrix[5] + cosTheta * matrix[9];
        result[9] = -sinTheta * matrix[5] + cosTheta * matrix[9];
+       result[10] = cosTheta * matrix[5] + sinTheta * matrix[9];
        return result;
    } 
 
@@ -240,8 +241,8 @@ showError("this is cubev1");
 
         theta = theta + Math.PI / 500;
         gl.uniformMatrix4fv(uniformLocations.uRotateX, false, rotateX(IdMatrix, theta)); //change values to 1 to stop 
-        gl.uniformMatrix4fv(uniformLocations.uRotateY, false, rotateY(IdMatrix, theta));
-        gl.uniformMatrix4fv(uniformLocations.uRotateZ, false, rotateX(IdMatrix, theta));
+        gl.uniformMatrix4fv(uniformLocations.uRotateY, false, rotateY(IdMatrix, 1));
+        gl.uniformMatrix4fv(uniformLocations.uRotateZ, false, rotateX(IdMatrix, 1));
         gl.uniformMatrix4fv(uniformLocations.uScale, false, scaleMatrix(IdMatrix, scaleVector));
         
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
