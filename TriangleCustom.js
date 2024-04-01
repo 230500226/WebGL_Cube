@@ -238,7 +238,7 @@ function mainFunction() {
         //Rotate X axis (Pitch)    
     const rotationMatrixX = [
         1, 0, 0, 0,
-        0, Math.cos(theta), Math.sin(theta), 0,
+        0, Math.cos(theta), -Math.sin(theta), 0,
         0, Math.sin(theta), Math.cos(theta), 0,
         0, 0, 0, 1
     ]
@@ -269,6 +269,7 @@ function mainFunction() {
         const sinTheta = Math.sin(theta);
         const result = matrix.slice(); // Create a copy of the matrix to modify the result
 
+        
         // Apply the rotation transformation
         result[0] = cosTheta * matrix[0] + sinTheta * matrix[2];
         result[2] = -sinTheta * matrix[0] + cosTheta * matrix[2];
